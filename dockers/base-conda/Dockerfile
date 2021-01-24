@@ -28,6 +28,7 @@ FROM nvidia/cuda:${CUDA_VERSION}-cudnn${CUDNN_VERSION}-devel-ubuntu18.04
 
 ARG PYTHON_VERSION=3.7
 ARG PYTORCH_VERSION=1.6
+# "pytorch" | "pytorch-nightly"
 ARG PYTORCH_CHANNEL=pytorch
 ARG CONDA_VERSION=4.7.12
 
@@ -97,18 +98,6 @@ ENV CONDA_DEFAULT_ENV=${CONDA_ENV}
 
 COPY ./requirements/extra.txt requirements-extra.txt
 COPY ./requirements/test.txt requirements-test.txt
-
-RUN \
-    # Disable cache
-    pip config set global.cache-dir false && \
-    # Drop fairscale for PT <= 1.4
-    if [[ $PYTORCH_VERSION < 1.4 ]] ; then \
-        python -c "fname = 'requirements-extra.txt' ; lines = [line for line in open(fname).readlines() if 'fairscale' not in line] ; open(fname, 'w').writelines(lines)" ; \
-    fi && \
-    # Install remaining requirements
-    pip install -r requirements-extra.txt --upgrade-strategy only-if-needed && \
-    pip install -r requirements-test.txt --upgrade-strategy only-if-needed && \
-    rm requirements*
 
 RUN \
     # install DALI, needed for examples
