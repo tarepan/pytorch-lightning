@@ -98,21 +98,3 @@ ENV CONDA_DEFAULT_ENV=${CONDA_ENV}
 
 COPY ./requirements/extra.txt requirements-extra.txt
 COPY ./requirements/test.txt requirements-test.txt
-
-RUN \
-    # install DALI, needed for examples
-    pip install --extra-index-url https://developer.download.nvidia.com/compute/redist nvidia-dali-cuda${CUDA_VERSION%%.*}0
-
-RUN \
-    # install NVIDIA AMP
-    git clone https://github.com/NVIDIA/apex && \
-    pip install --no-cache-dir --global-option="--cpp_ext" --global-option="--cuda_ext" ./apex && \
-    rm -rf apex
-
-RUN \
-    # Show what we have
-    pip --version && \
-    conda info && \
-    pip list && \
-    python -c "import sys; assert sys.version[:3] == '$PYTHON_VERSION', sys.version" && \
-    python -c "import torch; assert torch.__version__[:3] == '$PYTORCH_VERSION', torch.__version__"
